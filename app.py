@@ -27,6 +27,7 @@ class FirstScreen(Screen):
         version = Label(text="Версия 1.0", 
                         color = (0, 0, 0, 1), 
                         pos_hint ={'center_x': .92, 'center_y': .05})
+        version = Label(text="Версия 1.0")
         button = Button(text='Начать', 
                         size_hint=(.2, .06), 
                         pos_hint ={'center_x': .5, 'center_y': .2},
@@ -50,11 +51,11 @@ class SecondScreen(Screen, Image):
         super().__init__(**kwargs)
         
         self.capture = cv2.VideoCapture(0)
-        Clock.schedule_interval(self.update, 1.0 / 30)     
+        Clock.schedule_interval(self.update, 1.0 / 30)       
         
         self.button = Button(text = "Фото", 
                         size_hint=(.2, .06), 
-                        pos_hint ={'center_x': .5, 'center_y': .05})
+                        pos_hint ={'center_x': .5, 'center_y': .05}) 
         
         self.button.bind(on_press=self.take_pic)
         
