@@ -1,6 +1,9 @@
 #Импорт []файла
 import main
 #Импорт библиотек
+import os
+import cv2
+from ultralytics import YOLO
 from kivy.app import App 
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -13,8 +16,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import StringProperty
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
-import cv2
 
+#Загрузка модели YOLOv8
+model = YOLO('yolov8m-oiv7.pt')
 
 #Первый экран
 class FirstScreen(Screen):
@@ -25,9 +29,8 @@ class FirstScreen(Screen):
         logo = Image(source = 'logo.png')
         label = Label(text='OBJECT DETECTING', color = (0, 0, 0, 1))
         version = Label(text="Версия 1.0", 
-                        color = (0, 0, 0, 1), 
+                        color = (1, 1, 1, 1), 
                         pos_hint ={'center_x': .92, 'center_y': .05})
-        version = Label(text="Версия 1.0")
         button = Button(text='Начать', 
                         size_hint=(.2, .06), 
                         pos_hint ={'center_x': .5, 'center_y': .2},
@@ -55,7 +58,8 @@ class SecondScreen(Screen, Image):
         
         self.button = Button(text = "Фото", 
                         size_hint=(.2, .06), 
-                        pos_hint ={'center_x': .5, 'center_y': .05}) 
+                        pos_hint ={'center_x': .5, 'center_y': .05},
+                        background_color = (0, 0, 0, 1)) 
         
         self.button.bind(on_press=self.take_pic)
         
@@ -75,13 +79,33 @@ class SecondScreen(Screen, Image):
     #Обработка нажатий
     def take_pic(self, *args):
         cv2.imwrite("test.png", self.frame)
+        self.manager.current = 'third'
   
         
 #Третий экран     
 class ThirdScreen(Screen):
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def init(self, **kwargs):
+        super().init(**kwargs)
+        
+        button = Button(background_normal = 'back.png', 
+                        size_hint=(.05, .05), 
+                        pos_hint ={'center_x': .5, 'center_y': .5})
+        
+        model.predict('test.png', show = True, save = False)
+        
+        processed_image = Image(source = 'runs/detect/predict/test.png')
+    
+        button.on_press = self.next
+
+        self.add_widget(processed_image)
+        self.add_widget(button)
+        
+        if os.path.isfile('runs/detect/predict/test.png'): os.remove('runs/detect/predict/test.png')
+    
+    #Обработка нажатий
+    def next(self):
+        self.manager.current = 'second'
         
         
 #Управление приложением
