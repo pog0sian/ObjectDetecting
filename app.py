@@ -1,5 +1,3 @@
-#Импорт []файла
-import main
 #Импорт библиотек
 import os
 import cv2
@@ -19,6 +17,7 @@ from kivy.clock import Clock
 
 #Загрузка модели YOLOv8
 model = YOLO('yolov8m-oiv7.pt')
+
 
 #Первый экран
 class FirstScreen(Screen):
@@ -78,34 +77,9 @@ class SecondScreen(Screen, Image):
     
     #Обработка нажатий
     def take_pic(self, *args):
+        
         cv2.imwrite("test.png", self.frame)
-        self.manager.current = 'third'
-  
-        
-#Третий экран     
-class ThirdScreen(Screen):
-    
-    def init(self, **kwargs):
-        super().init(**kwargs)
-        
-        button = Button(background_normal = 'back.png', 
-                        size_hint=(.05, .05), 
-                        pos_hint ={'center_x': .5, 'center_y': .5})
-        
         model.predict('test.png', show = True, save = False)
-        
-        processed_image = Image(source = 'runs/detect/predict/test.png')
-    
-        button.on_press = self.next
-
-        self.add_widget(processed_image)
-        self.add_widget(button)
-        
-        if os.path.isfile('runs/detect/predict/test.png'): os.remove('runs/detect/predict/test.png')
-    
-    #Обработка нажатий
-    def next(self):
-        self.manager.current = 'second'
         
         
 #Управление приложением
@@ -119,7 +93,6 @@ class MyApp(App):
         sm = ScreenManager()
         sm.add_widget(FirstScreen(name='first'))
         sm.add_widget(SecondScreen(name='second'))
-        sm.add_widget(ThirdScreen(name='third'))
         return sm
     
     
